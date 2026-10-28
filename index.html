@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minecraft Launcher</title>
+  <style>
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: #111;
+      color: white;
+      font-family: system-ui, sans-serif;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    main {
+      width: min(100%, 440px);
+      text-align: center;
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 7px;
+      background: #4682B4;
+      color: white;
+      padding: 14px 22px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #35658b;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    #status {
+      overflow-wrap: anywhere;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <button id="launch" type="button">
+      Launch Minecraft
+    </button>
+    <p id="status" role="status">
+      Click to load Minecraft.
+    </p>
+  </main>
+
+  <script>
+    const gameUrl =
+      "https://raw.githubusercontent.com/justaguyalrok/minecraft-single-player/main/index.html";
+
+    const button = document.getElementById("launch");
+    const status = document.getElementById("status");
+
+    button.addEventListener("click", async () => {
+      button.disabled = true;
+      status.textContent = "Downloading Minecraft...";
+
+      try {
+        const response = await fetch(gameUrl);
+
+        if (!response.ok) {
+          throw new Error(
+            "Download failed: HTTP " + response.status
+          );
+        }
+
+        const html = await response.text();
+
+        if (!html.trim() ||
+            !/<html[\s>]/i.test(html)) {
+          throw new Error(
+            "The downloaded file isn't a complete HTML page."
+          );
+        }
+
+        status.textContent = "Starting Minecraft...";
+
+        // Replace this launcher with the actual HTML page.
+        document.open();
+        document.write(html);
+        document.close();
+
+      } catch (error) {
+        button.disabled = false;
+        status.textContent =
+          "Couldn't load Minecraft: " + error.message +
+          " Try opening the game through GitHub Pages instead.";
+
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
